@@ -17,15 +17,17 @@
 
 
 echo "Begin load-test..."
-log=out/$(date +"%Y-%m-%d_%H%M%S")-load.log
+date=$(date +"%Y-%m-%d_%H%M%S")
+log=out/$date-load.log
 echo "Begin load-test..." > $log
 echo "Writing stdout and stderr to $log"
 
 function single_host() {
   HOST=$1
-  scp test $HOST:/tmp/.t >> $log 2>&1
-  ssh $HOST /tmp/.t >> $log 2>&1
-  ssh $HOST rm -rf /tmp/.t >> $log 2>&1
+  ID=$(uuidgen)
+  scp test $HOST:/tmp/$ID >> $log 2>&1
+  ssh $HOST /tmp/$ID >> $log 2>&1
+  ssh $HOST rm -rf /tmp/$ID >> $log 2>&1
 }
 
 while read HOST; do
