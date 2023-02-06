@@ -1,0 +1,36 @@
+#!/bin/bash
+# =========================================================================== #
+#            MIT License Copyright (c) 2022 Kris Nóva <kris@nivenly.com>      #
+#                                                                             #
+#                 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓                 #
+#                 ┃   ███╗   ██╗ ██████╗ ██╗   ██╗ █████╗   ┃                 #
+#                 ┃   ████╗  ██║██╔═████╗██║   ██║██╔══██╗  ┃                 #
+#                 ┃   ██╔██╗ ██║██║██╔██║██║   ██║███████║  ┃                 #
+#                 ┃   ██║╚██╗██║████╔╝██║╚██╗ ██╔╝██╔══██║  ┃                 #
+#                 ┃   ██║ ╚████║╚██████╔╝ ╚████╔╝ ██║  ██║  ┃                 #
+#                 ┃   ╚═╝  ╚═══╝ ╚═════╝   ╚═══╝  ╚═╝  ╚═╝  ┃                 #
+#                 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                 #
+#                                                                             #
+#                        This machine kills fascists.                         #
+#                                                                             #
+# =========================================================================== #
+
+
+echo "Begin load-test..."
+log=out/$(date +"%Y-%m-%d_%H%M%S")-load.log
+echo "Begin load-test..." > $log
+echo "Writing stdout and stderr to $log"
+
+function single_host() {
+  HOST=$1
+  scp test $HOST:/tmp/.t >> $log 2>&1
+  ssh $HOST /tmp/.t >> $log 2>&1
+  ssh $HOST rm -rf /tmp/.t >> $log 2>&1
+}
+
+while read HOST; do
+  single_host $HOST &
+done <hosts
+
+
+echo "Spawned background jobs against each host in hosts file."
